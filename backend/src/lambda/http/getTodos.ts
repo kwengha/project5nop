@@ -1,4 +1,4 @@
-import { getTodosForUser } from './../../helpers/todos';
+import { getTodosForUser } from '../../businesslogic/todos';
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'

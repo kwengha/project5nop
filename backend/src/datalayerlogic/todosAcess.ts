@@ -1,5 +1,5 @@
-import { UpdateTodoRequest } from './../requests/UpdateTodoRequest';
-import { CreateTodoRequest } from './../requests/CreateTodoRequest';
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
+import { CreateTodoRequest } from '../requests/CreateTodoRequest';
 import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'

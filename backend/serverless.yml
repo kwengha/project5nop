@@ -117,11 +117,6 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - codedeploy:*
-        Resource:
-          - '*'
-      - Effect: Allow
-        Action:
           - dynamodb:putItem
         Resource: 
           - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
@@ -143,11 +138,6 @@ functions:
               'application/json': UpdateTodo
     iamRoleStatementsInherit: true
     iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - codedeploy:*
-        Resource:
-          - '*'
       - Effect: Allow
         Action:
           - dynamodb:updateItem

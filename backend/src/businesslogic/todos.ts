@@ -1,6 +1,6 @@
-import { TodoItem } from './../models/TodoItem';
-import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils';
+import { TodoItem } from '../models/TodoItem';
+import { TodosAccess } from '../datalayerlogic/todosAcess'
+import { AttachmentUtils } from '../filestoragelogic/attachmentUtils';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
