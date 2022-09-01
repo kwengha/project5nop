@@ -2,15 +2,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
+import { CreateCompleteRequest } from '../../requests/CreateCompleteRequest'
 import { getUserId } from '../utils';
-import { createTodoForUser } from '../../businesslogic/todos'
+import { createCompleteForUser } from '../../businesslogic/complete'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const newTodo: CreateTodoRequest = JSON.parse(event.body)
+    const newComplete: CreateCompleteRequest = JSON.parse(event.body)
     const userId = await getUserId(event);
-    const todoId = await createTodoForUser(userId, newTodo);
+    const completeId = await createCompleteForUser(userId, newComplete);
 
     return {
       statusCode: 201,
@@ -21,8 +21,8 @@ export const handler = middy(
       body: JSON.stringify({
         item:
             {
-              todoId: todoId,
-              ...newTodo
+              completeId: completeId,
+              ...newComplete
             }
       })
     };

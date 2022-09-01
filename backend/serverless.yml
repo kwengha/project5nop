@@ -1,7 +1,7 @@
 # TODO: Change the name of the org 
 org: kwengha
-app: backend-todo
-service: serverless-todo-app
+app: backend-complete
+service: serverless-complete-app
 
 plugins:
   - serverless-webpack
@@ -22,15 +22,15 @@ custom:
     api:
       info:
         version: v1.0.0
-        title: ToDos API
-        description: serverless api for ToDo application
+        title: Completes API
+        description: serverless api for Complete application
     models:
-      - name: CreateTodo
+      - name: CreateComplete
         contentType: application/json
-        schema: ${file(models/create-todo-model.json)}
-      - name: UpdateTodo
+        schema: ${file(models/create-complete-model.json)}
+      - name: UpdateComplete
         contentType: application/json
-        schema: ${file(models/update-todo-model.json)}
+        schema: ${file(models/update-complete-model.json)}
         
 provider:
   name: aws
@@ -47,9 +47,9 @@ provider:
   # Use these variables in the functions and resouorces section below. For example, 
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
-    TODOS_TABLE: Todos-${self:provider.stage}
-    TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    TODOS_S3_BUCKET: p4-todo-images-212612323429-${self:provider.stage}
+    COMPLETE_TABLE: Completes-${self:provider.stage}
+    COMPLETE_CREATED_AT_INDEX: CreatedAtIndex
+    COMPLETE_S3_BUCKET: p5-complete-images-212612323430-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 30000
       
   logs:
@@ -72,12 +72,12 @@ functions:
 
   # TODO: Configure this function - 
   # Provide iamRoleStatements property for performing Actions on DynamoDB
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetCompletes:
+    handler: src/lambda/http/getCompletes.handler
     events:
       - http:
           method: get
-          path: todos
+          path: completes
           cors: true
           authorizer: Auth
     iamRoleStatementsInherit: true
@@ -90,68 +90,101 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}
+
+
+  GetCompleteById:
+    handler: src/lambda/http/getCompleteById.handler
+    events:
+      - http:
+          method: get
+          path: completes/{completeId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - codedeploy:*
+        Resource:
+          - '*'
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}
 
   # TODO: Configure this function - 
   # Provide iamRoleStatements property. Decide the Actions and AWS Resource. 
   # To refer to an AWS resource defined in the "Resources" section, you can use "Resource: !GetAtt <resource-name>.Arn"
   # To validate incoming HTTP requests, we have provided the request schemas in function definition below. 
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  CreateComplete:
+    handler: src/lambda/http/createComplete.handler
     events:
       - http:
           method: post
-          path: todos
+          path: completes
           cors: true
           authorizer: Auth
           request:
             schemas:
-              application/json: ${file(models/create-todo-model.json)}
+              application/json: ${file(models/create-complete-model.json)}
           reqValidatorName: RequestBodyValidator
           documentation:
-            summary: Create todo task
-            description: Create a new todo item
+            summary: Create complete task
+            description: Create a new complete item
             requestModels:
-              'application/json': CreateTodo
+              'application/json': CreateComplete
     iamRoleStatementsInherit: true
     iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - codedeploy:*
+        Resource:
+          - '*'
       - Effect: Allow
         Action:
           - dynamodb:putItem
         Resource: 
-          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}
+
+          
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements, and request schemas
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
+  UpdateComplete:
+    handler: src/lambda/http/updateComplete.handler
     events:
       - http:
           method: patch
-          path: todos/{todoId}
+          path: completes/{completeId}
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
-            summary: update todo task
-            description: update a new todo item
+            summary: update complete task
+            description: update a new complete item
             requestModels:
-              'application/json': UpdateTodo
+              'application/json': UpdateComplete
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - codedeploy:*
+        Resource:
+          - '*'
+      - Effect: Allow
+        Action:
           - dynamodb:updateItem
         Resource: 
-          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}      
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}      
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
+  DeleteComplete:
+    handler: src/lambda/http/deleteComplete.handler
     events:
       - http:
           method: delete
-          path: todos/{todoId}
+          path: completes/{completeId}
           cors: true
     iamRoleStatementsInherit: true
     iamRoleStatements:
@@ -159,7 +192,7 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: 
-          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -168,7 +201,7 @@ functions:
     events:
       - http:
           method: post
-          path: todos/{todoId}/attachment
+          path: completes/{completeId}/attachment
           cors: true
           reqValidatorName: RequestBodyValidator
     iamRoleStatementsInherit: true
@@ -177,12 +210,12 @@ functions:
         Action:
           - s3:PutObject
           - s3:GetObject
-        Resource: arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*
+        Resource: arn:aws:s3:::${self:provider.environment.COMPLETE_S3_BUCKET}/*
       - Effect: Allow
         Action:
           - dynamodb:updateItem
         Resource:
-          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+          - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETE_TABLE}
       - Effect: Allow
         Action:
           - xray:PutTraceSegments
@@ -214,25 +247,25 @@ resources:
         ValidateRequestParameters: false
     
     # TODO: Create a DynamoDB table with local secondary index and a composite key
-    TodosTable:
+    CompletesTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: todoId
+          - AttributeName: completeId
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: completeId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.COMPLETE_TABLE}
         LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+          - IndexName: ${self:provider.environment.COMPLETE_CREATED_AT_INDEX}
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH
@@ -246,7 +279,7 @@ resources:
     AttachmentsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.TODOS_S3_BUCKET}
+        BucketName: ${self:provider.environment.COMPLETE_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
             - AllowedOrigins:
@@ -276,5 +309,5 @@ resources:
               Action: 
                 - s3:GetObject
                 - s3:PutObject
-              Resource: 'arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*'
+              Resource: 'arn:aws:s3:::${self:provider.environment.COMPLETE_S3_BUCKET}/*'
         Bucket: !Ref AttachmentsBucket

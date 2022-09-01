@@ -1,4 +1,4 @@
-import { getTodosForUser } from '../../businesslogic/todos';
+import { getCompletesForUser } from '../../businesslogic/complete';
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
@@ -11,7 +11,7 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // Write your code here
     const userId = await getUserId(event);
-    const todosItem = await getTodosForUser(userId);  
+    const completeItem = await getCompletesForUser(userId);  
     return {
       statusCode: 200,
       headers: {
@@ -19,7 +19,7 @@ export const handler = middy(
           'Access-Control-Allow-Credentials': true
       },
       body: JSON.stringify({
-          items: todosItem
+          items: completeItem
       })
     }
   }

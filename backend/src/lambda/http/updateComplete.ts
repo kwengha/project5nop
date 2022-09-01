@@ -4,16 +4,17 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
+import { UpdateCompleteRequest } from '../../requests/UpdateCompleteRequest'
 import { getUserId } from '../utils'
-import { deleteTodo } from '../../businesslogic/todos'
+import { updateComplete } from '../../businesslogic/complete'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const todoId = event.pathParameters.todoId
-    console.log("1234: ", todoId);
+    const completeId = event.pathParameters.completeId
+    const updatedComplete: UpdateCompleteRequest = JSON.parse(event.body)
     const userId = await getUserId(event);
-    await deleteTodo(todoId, userId);
-    
+    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+    await updateComplete(userId, completeId, updatedComplete)
     return {
       statusCode: 202,
       headers: {
@@ -21,7 +22,7 @@ export const handler = middy(
         'Access-Control-Allow-Credentials': true
       },
       body: JSON.stringify({})
-    };
+    }
   }
 )
 
